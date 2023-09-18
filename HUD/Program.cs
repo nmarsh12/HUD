@@ -8,18 +8,30 @@ namespace HUD
 {
     internal class Program
     {
-        
-
         static void Main(string[] args)
         {
+            int playerMaxHealth = 100;
+            int playerCurrentHealth;
+            string healthStatus;
+            int playerMaxShield = 100;
+            int playerCurrentShield;
+
             List<String> screen;
             screen = new List<String> { "a", "b" };
+            bool running = true;
+            ConsoleKey currentInput;
 
             ConsoleKey ReadInput()
             {
                 return Console.ReadKey(true).Key;
             }
-            
+           
+            void FillScreen(){
+                 screen = new List<String>{
+                    
+               }; 
+            }
+
             void DrawScreen()
             {
                 Console.Clear();
@@ -33,6 +45,13 @@ namespace HUD
             {
                 DrawScreen();
                 ReadInput();
+            }
+
+            while (running) {
+                currentInput = ReadInput();
+                if ( currentInput == ConsoleKey.Q ) {
+                   running = false;
+                }
             }
         }
     }
