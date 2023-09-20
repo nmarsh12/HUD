@@ -65,20 +65,20 @@ namespace HUD
                 "Die"
             };
 
-            void Attack() {
-                enemyHealth -= playerDamage;
+            void Attack( Entity enemy ) {
+                enemy.currentHealth -= player.damage;
             }
 
             void OptionSelector( string optionSelected ) {
                 switch ( optionSelected ) {
                     case "Attack":
-                        Attack();
+                        Attack( defaultEnemy );
                         break;
                 }
             }
 
 
-           
+            // This setup barely works so I'm overhauling it later
             void FillScreen(){
                 playerHealthDisplay = "Health: " + player.currentHealth + "/" + player.maxHealth;
                 playerShieldDisplay = "Shield: " + player.currentShield + "/" + player.maxShield;
@@ -88,9 +88,13 @@ namespace HUD
                 screen = new List<String> {
                     playerHealthDisplay,
                     playerShieldDisplay,
-                    player.lives.ToString(),
+                    "Lives: " + player.lives,
                     "",
-                    enemyHealthDisplay
+                    enemyHealthDisplay,
+                    "",
+                    "[ Esc ] to quit game",
+                    "[ Space ] to damage enemy",
+                    "Revive doesn't work yet and neither does my negative health stopper"
                 }; 
             }
 
@@ -108,6 +112,7 @@ namespace HUD
                 }
             }
 
+            // Also bad, also overhauling
             void ManageInput()
             {
                 currentInput = ReadInput();
