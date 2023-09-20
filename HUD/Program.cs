@@ -1,27 +1,42 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace HUD
 {
     internal class Program
-    {
+    {        
         static void Main(string[] args)
         {
-            int playerMaxHealth = 100;
-            int playerCurrentHealth;
-            string healthStatus = "Alive";
-            int playerMaxShield = 100;
-            int playerCurrentShield;
+            // Code is terrible, in the middle of renovation
+            // Putting everything in Main() is not doing it for me
 
-            // This is the position of the pointer for the menu arrow thing to move it around
+            Player player = new Player();
+            Entity defaultEnemy = new Entity();
+
+            player.maxHealth = 100; 
+            player.maxShield = 100;
+            player.lives = 3;
+            
+
+            int playerMaxShield = 100;
+
+            int playerDamage = 10;
+
+            int enemyHealth = 20;
+            int enemyDamage = 5;
+
+            // This is the position of the pointer for the menu arrow thing to move it around, not used yet
             int optionSelectIndex = 0;
 
             string playerHealthDisplay;
             string playerShieldDisplay;
-            string playerStatusDisplay;
+
+            string enemyHealthDisplay;
             string quitInfo;
 
             List<String> screen;
@@ -36,41 +51,60 @@ namespace HUD
 
             void OnStart()
             {
-                playerCurrentHealth = playerMaxHealth;
-                playerCurrentShield = playerMaxShield;
+                player.currentHealth = player.maxHealth;
+                player.currentShield = player.maxShield;
+                player.damage = 10;
+
+                defaultEnemy.damage = 20;
             }
 
-            List<String> OptionsMenu()
-            {
+            List<String> options = new List<String> {
+                "Attack",
+                "Heal",
+                "Regenerate Shield",
+                "Die"
+            };
 
+            void Attack() {
+                enemyHealth -= playerDamage;
             }
 
-            void OptionsController(string[] options)
-            {
-
+            void OptionSelector( string optionSelected ) {
+                switch ( optionSelected ) {
+                    case "Attack":
+                        Attack();
+                        break;
+                }
             }
+
+
            
             void FillScreen(){
-                playerHealthDisplay = "Health: " + playerCurrentHealth + "/" + playerMaxHealth;
-                playerShieldDisplay = "Shield: " + playerCurrentShield + "/" + playerMaxShield;
-                playerStatusDisplay = "Player is " + healthStatus;
+                playerHealthDisplay = "Health: " + player.currentHealth + "/" + player.maxHealth;
+                playerShieldDisplay = "Shield: " + player.currentShield + "/" + player.maxShield;
+                enemyHealthDisplay = "Enemy HP: " + defaultEnemy.currentHealth;
                 quitInfo = "Press Escape Key to Quit";
 
-                screen = new List<String>{
+                screen = new List<String> {
                     playerHealthDisplay,
                     playerShieldDisplay,
-                    playerStatusDisplay,
+                    player.lives.ToString(),
                     "",
-                    quitInfo
+                    enemyHealthDisplay
                 }; 
             }
 
             void DrawScreen()
             {
                 Console.Clear();
-                foreach ( string line in screen )
+                ShowHUD();
+            }
+
+            void ShowHUD()
+            {
+                foreach (string line in screen)
                 {
-                    Console.WriteLine( line );
+                    Console.WriteLine(line);
                 }
             }
 
@@ -90,7 +124,17 @@ namespace HUD
                     case ConsoleKey.RightArrow:
                     case ConsoleKey.D:
                         optionSelectIndex += 1; break;
+
+                    case ConsoleKey.Spacebar:
+                        OptionSelector ("Attack"); break;
                 }
+            }
+
+            
+
+            void PlayerTurn()
+            {
+                ManageInput();
             }
 
             // Game Loop
@@ -100,8 +144,60 @@ namespace HUD
             while (running) {
                 FillScreen();
                 DrawScreen();
-                Console.WriteLine(optionSelectIndex);
-                ManageInput();
+                PlayerTurn();
+                player.TakeDamage(defaultEnemy.damage);
+            }
+        }
+    }
+
+    public class Entity
+    {
+        public int currentHealth;
+        public int maxHealth;
+        public int damage;
+        public int maxShield;
+        public int currentShield;
+        public int lives;
+
+        /*string DisplayStat (int stat)
+        {
+
+        }*/
+
+        public void TakeDamage(int damage)
+        {
+            if ( currentShield > 0)
+            {
+                currentShield -= damage;
+            }
+            else currentHealth -= damage;
+
+            
+        }
+
+        public void Revive()
+        {
+            if (lives > 0)
+            {
+                currentHealth = maxHealth;
+                currentShield = maxShield;
+
+                lives -= 1;
+            }
+
+            // else GameOver();
+        }
+    }
+
+    public class Player : Entity
+    {
+        // NTS, Nothing calls this, probably needs restructure
+        void Die()
+        {
+            if (currentHealth <= 0)
+            {
+                currentHealth = 0;
+                Revive();
             }
         }
     }
