@@ -15,17 +15,16 @@ namespace HUD
             // Code is terrible, in the middle of renovation
             // Putting everything in Main() is not doing it for me
 
-            Player player = new Player();
+            Entity player = new Entity();
             Entity defaultEnemy = new Entity();
+
+            List<Entity> enemies = new List<Entity>();
 
             player.maxHealth = 100; 
             player.maxShield = 100;
             player.lives = 3;
-            
+            player.damage = 10;
 
-            int playerMaxShield = 100;
-
-            int playerDamage = 10;
 
             int enemyHealth = 20;
             int enemyDamage = 5;
@@ -100,7 +99,10 @@ namespace HUD
 
             void DrawScreen()
             {
-                Console.Clear();
+                // Same as Console.Clear in effect but doesn't flicker
+                // BUG: When currentHealth and currentShield change digits (100 -> 99, 10 -> 9), it moves the number display left a digit but doesn't delete the farthest right digit
+                // Which changes 100/100 to 99/1000 instead of 99/100
+                Console.SetCursorPosition(0, 1);
                 ShowHUD();
             }
 
@@ -135,8 +137,6 @@ namespace HUD
                 }
             }
 
-            
-
             void PlayerTurn()
             {
                 ManageInput();
@@ -151,6 +151,7 @@ namespace HUD
                 DrawScreen();
                 PlayerTurn();
                 player.TakeDamage(defaultEnemy.damage);
+                player.CheckForDeath();
             }
         }
     }
@@ -164,20 +165,13 @@ namespace HUD
         public int currentShield;
         public int lives;
 
-        /*string DisplayStat (int stat)
-        {
-
-        }*/
-
         public void TakeDamage(int damage)
         {
-            if ( currentShield > 0)
+            if (currentShield > 0)
             {
                 currentShield -= damage;
             }
             else currentHealth -= damage;
-
-            
         }
 
         public void Revive()
@@ -189,15 +183,9 @@ namespace HUD
 
                 lives -= 1;
             }
-
-            // else GameOver();
         }
-    }
 
-    public class Player : Entity
-    {
-        // NTS, Nothing calls this, probably needs restructure
-        void Die()
+        public void CheckForDeath()
         {
             if (currentHealth <= 0)
             {
@@ -206,4 +194,9 @@ namespace HUD
             }
         }
     }
+
+    /*public class GameManager()
+    {
+
+    }*/
 }

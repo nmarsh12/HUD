@@ -1,0 +1,33 @@
+How to make screen system
+
+Ignore turn based input for now, just use key inputs
+
+____________________________________________________
+
+Health: [@@                             ] (8/100)    }
+Shield: [                               ] (0/100)	 }  GM.PlayerStatusMessage -> GM.GenerateHud
+Lives: [*] [ ] [ ]									 }
+
+Enemies												 }  GM.EnemyManager -> GM.GenerateHud
+Whitebeard
+[                 ]
+Blackbeard
+[00000000000000000]
+
+[>] Attack											 }  GM.InputManager -> GM.InputDisplay -> GM.GenerateHud
+[ ] Item
+[ ] Inspect
+[ ] Quit
+
+Log
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Whitebeard was stabbed		-5 HP [1 Turn Ago]
+Player is Fleeing
+Whitebeard was shot			-6 HP
+Whitebeard was stabbed		-10 HP
+Whitebeard was stabbed		-10 HP
+Whitebeard was killed
+Blackbeard covers Whitebeard with a blanket
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+____________________________________________________
